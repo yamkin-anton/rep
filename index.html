@@ -208,7 +208,11 @@
         @media (max-width: 768px) {
             header {
                 min-height: 85vh;
+                background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.6)), 
+                            url('back.jpg') center 30% / cover no-repeat; /* Улучшенное позиционирование */
+                background-attachment: scroll; /* Убираем fixed на мобильных — лучше работает */
             }
+            
             .photo {
                 width: 200px;
                 height: 200px;
@@ -245,6 +249,9 @@
         }
 
         @media (max-width: 480px) {
+            header {
+                background-position: center 40%; /* Дополнительная подстройка для очень маленьких экранов */
+            }
             h1 {
                 font-size: 2rem;
             }
@@ -366,7 +373,6 @@
     </button>
 
     <script>
-        // Анимация секций
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -377,7 +383,6 @@
 
         document.querySelectorAll('.section').forEach(section => observer.observe(section));
 
-        // Клик по услугам
         document.querySelectorAll('.service-card').forEach(card => {
             card.addEventListener('click', () => {
                 const serviceText = card.getAttribute('data-service');
@@ -387,7 +392,6 @@
             });
         });
 
-        // Форма
         const form = document.getElementById('contact-form');
         const messageDiv = document.getElementById('form-message');
 
