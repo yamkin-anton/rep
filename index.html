@@ -14,6 +14,9 @@
             --primary: #0066cc;
             --accent: #00c4d8;
         }
+        * {
+            box-sizing: border-box;
+        }
         body { 
             font-family: 'Inter', system-ui, sans-serif; 
             margin: 0; 
@@ -151,19 +154,37 @@
             transform: translateY(-4px); 
         }
 
-        form { max-width: 560px; margin: 0 auto; }
+        /* Форма — исправлено переполнение */
+        form { 
+            max-width: 100%; 
+            margin: 0 auto; 
+            padding: 0 10px;
+        }
         input, textarea { 
             width: 100%; 
-            padding: 14px; 
+            padding: 14px 16px; 
             margin: 10px 0; 
             border: 1px solid #ddd; 
             border-radius: 12px; 
             font-size: 1.05rem; 
+            box-sizing: border-box;
         }
-        .form-button { text-align: center; margin-top: 20px; }
 
-        .contacts-info { text-align: center; margin: 40px 0 20px; font-size: 1.1rem; }
-        #form-message { text-align: center; margin: 20px 0; font-weight: 500; }
+        .form-button { 
+            text-align: center; 
+            margin-top: 20px; 
+        }
+
+        .contacts-info { 
+            text-align: center; 
+            margin: 40px 0 20px; 
+            font-size: 1.1rem; 
+        }
+        #form-message { 
+            text-align: center; 
+            margin: 20px 0; 
+            font-weight: 500; 
+        }
         footer { 
             text-align: center; 
             padding: 2.5rem 1rem; 
@@ -209,28 +230,26 @@
             header {
                 min-height: 85vh;
                 background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.6)), 
-                            url('back.jpg') center 30% / cover no-repeat; /* Улучшенное позиционирование */
-                background-attachment: scroll; /* Убираем fixed на мобильных — лучше работает */
+                            url('back.jpg') center 30% / cover no-repeat;
+                background-attachment: scroll;
             }
             
-            .photo {
-                width: 200px;
-                height: 200px;
-            }
-            h1 {
-                font-size: 2.2rem;
-            }
-            .subtitle {
-                font-size: 1.25rem;
-            }
-            .highlight {
-                font-size: 1.1rem;
-                padding: 6px 16px;
-            }
+            .photo { width: 200px; height: 200px; }
+            h1 { font-size: 2.2rem; }
+            .subtitle { font-size: 1.25rem; }
+            .highlight { font-size: 1.1rem; padding: 6px 16px; }
 
             .section {
-                padding: 2.5rem 1.2rem;
+                padding: 2.4rem 1.2rem;
                 margin: 2rem 0;
+            }
+
+            form {
+                padding: 0 5px;
+            }
+            input, textarea {
+                padding: 13px 14px;
+                font-size: 1rem;
             }
 
             .services {
@@ -241,26 +260,16 @@
             .review-card {
                 min-width: 280px;
             }
-
-            .btn {
-                padding: 13px 28px;
-                font-size: 1rem;
-            }
         }
 
         @media (max-width: 480px) {
             header {
-                background-position: center 40%; /* Дополнительная подстройка для очень маленьких экранов */
+                background-position: center 40%;
             }
-            h1 {
-                font-size: 2rem;
-            }
-            .container {
-                padding: 1rem 0.8rem;
-            }
-            .section {
-                padding: 2rem 1rem;
-            }
+            h1 { font-size: 2rem; }
+            .container { padding: 1rem 0.8rem; }
+            .section { padding: 2rem 1rem; }
+            input, textarea { font-size: 0.98rem; }
         }
     </style>
 </head>
