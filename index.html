@@ -138,6 +138,15 @@
             flex-direction: column;
         }
 
+        .review-author {
+            margin-top: auto;
+            text-align: left;
+            padding-top: 16px;
+            font-size: 0.95rem;
+            color: #444;
+            border-top: 2px solid var(--accent);
+        }
+
         .btn { 
             background: var(--primary); 
             color: white; 
@@ -192,11 +201,23 @@
             color: #aaa; 
             font-size: 0.95rem;
         }
+        .footer-credit {
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+        .footer-credit a {
+            color: #00c4d8;
+            text-decoration: none;
+        }
+        .footer-credit a:hover {
+            color: #00e0f0;
+            text-decoration: underline;
+        }
 
         /* Кнопка "Наверх" */
         .back-to-top {
             position: fixed;
-            bottom: 20px;
+            bottom: 40px;
             right: 20px;
             width: 54px;
             height: 54px;
@@ -318,11 +339,11 @@
             <div class="price-card">
                 <p style="font-size:1.25rem; margin:0;"><strong>Индивидуальное занятие (60 минут)</strong></p>
                 <ul style="list-style:none; padding:0; font-size:1.2rem; margin:20px 0;">
-                    <li><strong>ОГЭ</strong> — 1500 ₽</li>
-                    <li><strong>ЕГЭ</strong> — 2000-2500 ₽</li>
-                    <li><strong>Продвинутый Python</strong> — 1500 ₽</li>
+                    <li><strong>ОГЭ (60 минут)</strong> — 1500 ₽</li>
+                    <li><strong>ЕГЭ (60 минут)</strong> — 2000–2500 ₽</li>
+                    <li><strong>Продвинутый Python (60 минут)</strong> — 1500 ₽</li>
                 </ul>
-                <p>Первое пробное — по договорённости.</p>
+                <p>Пакеты занятий со скидкой. Первое пробное занятие — по договорённости.</p>
             </div>
         </div>
 
@@ -340,14 +361,14 @@
                 </div>
                 <div class="review-card">
                     <p>«Спасибо большое! Без Вас я бы даже порога не набрала.»</p>
-                    <div class="review-author"><strong>Лиза Б.</strong> <strong style="color:#0066cc;">оценка 5, ОГЭ</strong></div>
+                    <div class="review-author"><strong>Лиза Б.</strong> <strong style="color:#0066cc;">Оценка 5, ОГЭ</strong></div>
                 </div>
                 <div class="review-card">
                     <p>«Хочу выразить огромную благодарность. Вы лучший репетитор!»</p>
                     <div class="review-author"><strong>Максим П.</strong> <strong style="color:#0066cc;">80 баллов, ЕГЭ</strong></div>
                 </div>
 
-                <!-- Новые отзывы из файла -->
+                <!-- Новые отзывы -->
                 <div class="review-card">
                     <p>«Начал готовиться к ЕГЭ в 11 классе с нуля. Благодаря подготовке информатика стала интересной, написал 90 баллов.»</p>
                     <div class="review-author"><strong>Даниил Ш.</strong> <strong style="color:#0066cc;">90 баллов, ЕГЭ</strong></div>
@@ -355,10 +376,6 @@
                 <div class="review-card">
                     <p>«Соглашусь, что невнимательность играет большую роль. Начал в 10 классе — очень помогает. Сдал на 83.»</p>
                     <div class="review-author"><strong>Иван Т.</strong> <strong style="color:#0066cc;">83 балла, ЕГЭ</strong></div>
-                </div>
-                <div class="review-card">
-                    <p>«Спасибо большое за подготовку! Без Вас я бы даже порога не набрала.»</p>
-                    <div class="review-author"><strong>Лиза Б.</strong> <strong style="color:#0066cc;">оценка 5, ОГЭ</strong></div>
                 </div>
                 <div class="review-card">
                     <p>«Спасибо большое за подготовку, вы лучший репетитор который у меня был.»</p>
@@ -374,7 +391,7 @@
                 </div>
                 <div class="review-card">
                     <p>«Вам спасибо за подготовку❤️, у меня из класса у единственной 5 так еще и максимум.»</p>
-                    <div class="review-author"><strong>Юлиана К.</strong> <strong style="color:#0066cc;">оценка 5, ОГЭ</strong></div>
+                    <div class="review-author"><strong>Юлиана К.</strong> <strong style="color:#0066cc;">Оценка 5, ОГЭ</strong></div>
                 </div>
                 <div class="review-card">
                     <p>«Результат прекрасный, спасибо за подготовку Игоря.»</p>
@@ -386,7 +403,7 @@
         <div class="section contacts" id="contact-section">
             <h2 style="text-align:center; font-size:2.2rem;">Запишитесь на занятие</h2>
             
-            <form id="contact-form" action="https://formspree.io/f/xvznlbbe" method="POST">
+            <form id="contact-form" action="https://formspree.io/f/xeebqory" method="POST">
                 <input type="text" name="name" placeholder="Имя ученика / родителя" required>
                 <input type="tel" name="phone" placeholder="Телефон для связи" required>
                 <input type="email" name="email" placeholder="Email">
@@ -410,6 +427,9 @@
 
     <footer>
         <p>© 2026 Ямкина Елена Владимировна • Ульяновск</p>
+        <p class="footer-credit">
+            Дизайн и разработка сайта — <a href="https://t.me/IFELY363" target="_blank">@IFELY363</a>
+        </p>
     </footer>
 
     <!-- Кнопка "Наверх" -->
@@ -440,19 +460,41 @@
         const form = document.getElementById('contact-form');
         const messageDiv = document.getElementById('form-message');
 
+        // Защита от спама (1 заявка в сутки)
+        function canSubmitForm() {
+            const lastSubmit = localStorage.getItem('lastFormSubmit');
+            if (!lastSubmit) return true;
+            
+            const lastDate = new Date(lastSubmit);
+            const today = new Date();
+            return lastDate.getDate() !== today.getDate() || 
+                   lastDate.getMonth() !== today.getMonth() || 
+                   lastDate.getFullYear() !== today.getFullYear();
+        }
+
         form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!canSubmitForm()) {
+                messageDiv.innerHTML = '<p style="color:#ff9800; font-size:1.1rem;">Вы уже отправляли заявку сегодня.<br>Напишите мне в Telegram или VK.</p>';
+                return;
+            }
+
             messageDiv.innerHTML = '<p style="color:#0066cc;">Отправляем заявку...</p>';
+
             try {
                 const response = await fetch(form.action, {
                     method: 'POST',
                     body: new FormData(form),
                     headers: { 'Accept': 'application/json' }
                 });
+
                 if (response.ok) {
-                    messageDiv.innerHTML = '<p style="color:green; font-size:1.1rem;">✅ Заявка успешно отправлена!</p>';
+                    localStorage.setItem('lastFormSubmit', new Date().toISOString());
+                    messageDiv.innerHTML = '<p style="color:green; font-size:1.1rem;">✅ Заявка успешно отправлена!<br>Я свяжусь с вами в ближайшее время.</p>';
                     form.reset();
                 } else {
-                    messageDiv.innerHTML = '<p style="color:red;">Ошибка отправки. Попробуйте позже.</p>';
+                    messageDiv.innerHTML = '<p style="color:red;">Ошибка отправки. Попробуйте позже или напишите в Telegram.</p>';
                 }
             } catch (error) {
                 messageDiv.innerHTML = '<p style="color:red;">Ошибка соединения. Напишите в Telegram или MAX.</p>';
