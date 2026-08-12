@@ -89,13 +89,32 @@
 
                         <label class="field">
                             <span>Пароль</span>
-                            <input type="password" name="password" required minlength="6"
+                            <input type="password" name="password" required minlength="10"
                                 autocomplete="current-password">
-                            <span class="field-hint">Не короче 6 символов.</span>
+                            <span class="field-hint" id="password-hint">Не короче 10 символов, обязательно
+                                строчные и заглавные буквы и хотя бы одна цифра.</span>
                         </label>
 
                         <button class="btn btn-lg" type="submit" id="submit-btn" style="width:100%;">Войти</button>
                         <div id="auth-message" class="form-msg"></div>
+                    </form>
+
+                    <!-- Второй шаг входа: код из приложения-аутентификатора -->
+                    <form id="mfa-form" hidden>
+                        <h2 style="font-size:1.5rem;">Подтверждение входа</h2>
+                        <p class="muted" style="font-size:.95rem;">
+                            Откройте приложение-аутентификатор и введите шестизначный код.
+                        </p>
+                        <label class="field">
+                            <span>Код подтверждения</span>
+                            <input type="text" name="code" inputmode="numeric" autocomplete="one-time-code"
+                                maxlength="6" pattern="[0-9]{6}" required
+                                style="letter-spacing:.4em;text-align:center;font-size:1.3rem;">
+                        </label>
+                        <button class="btn btn-lg" type="submit" id="mfa-btn" style="width:100%;">Подтвердить</button>
+                        <button class="btn btn-ghost" type="button" id="mfa-cancel"
+                            style="width:100%;margin-top:.6rem;">Отмена</button>
+                        <div id="mfa-message" class="form-msg"></div>
                     </form>
 
                     <p class="muted" style="font-size:.88rem;margin:1.4rem 0 0;">

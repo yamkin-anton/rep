@@ -63,8 +63,15 @@ form.addEventListener('submit', async (e) => {
     const pass = password.value;
     const fullName = form.elements.full_name.value.trim();
 
-    if (!email || pass.length < 6) {
-        showMsg(message, 'Проверьте почту и пароль: пароль должен быть не короче 6 символов.', 'err');
+    if (!email) {
+        showMsg(message, 'Укажите электронную почту.', 'err');
+        return;
+    }
+
+    // При регистрации проверяем требования к паролю сразу, не гоняя на сервер.
+    const weak = mode === 'signup' ? passwordProblem(pass) : (pass ? null : 'Введите пароль.');
+    if (weak) {
+        showMsg(message, weak, 'err');
         return;
     }
     if (mode === 'signup' && !fullName) {
@@ -95,12 +102,89 @@ form.addEventListener('submit', async (e) => {
             if (error) throw error;
         }
 
-        const state = await authState({ refresh: true });
-        location.href = nextPage(state.isAdmin);
+        // Если у пользователя включён двухфакторный вход, сессия сейчас
+        // имеет уровень aal1 и нужен код из приложения.
+        if (await needsSecondFactor()) {
+            showMfaStep();
+            return;
+        }
+
+        await finishLogin();
     } catch (error) {
         showMsg(message, translate(error), 'err');
         submit.disabled = false;
     }
+});
+
+async function finishLogin() {
+    const state = await authState({ refresh: true });
+    location.href = nextPage(state.isAdmin);
+}
+
+/** Требования к паролю совпадают с настройками проекта Supabase. */
+function passwordProblem(value) {
+    if (value.length < 10) return 'Пароль должен быть не короче 10 символов.';
+    if (!/[a-zа-я]/.test(value)) return 'Добавьте в пароль строчную букву.';
+    if (!/[A-ZА-Я]/.test(value)) return 'Добавьте в пароль заглавную букву.';
+    if (!/[0-9]/.test(value)) return 'Добавьте в пароль хотя бы одну цифру.';
+    return null;
+}
+
+/* --------------------------------------------------------- Второй фактор */
+
+const mfaForm = document.getElementById('mfa-form');
+const mfaMessage = document.getElementById('mfa-message');
+const mfaBtn = document.getElementById('mfa-btn');
+
+async function needsSecondFactor() {
+    const { data, error } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (error) return false;
+    return data.nextLevel === 'aal2' && data.currentLevel !== 'aal2';
+}
+
+function showMfaStep() {
+    form.hidden = true;
+    document.querySelector('.tabs').hidden = true;
+    document.getElementById('form-title').hidden = true;
+    document.getElementById('form-lead').hidden = true;
+    mfaForm.hidden = false;
+    mfaForm.elements.code.focus();
+}
+
+mfaForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const code = mfaForm.elements.code.value.trim();
+    if (!/^\d{6}$/.test(code)) {
+        showMsg(mfaMessage, 'Код состоит из шести цифр.', 'err');
+        return;
+    }
+
+    mfaBtn.disabled = true;
+    showMsg(mfaMessage, 'Проверяем код...', 'info');
+
+    try {
+        const { data: factors, error: listError } = await sb.auth.mfa.listFactors();
+        if (listError) throw listError;
+
+        const totp = factors.totp?.[0];
+        if (!totp) throw new Error('Не найдено приложение-аутентификатор.');
+
+        const { error } = await sb.auth.mfa.challengeAndVerify({ factorId: totp.id, code });
+        if (error) throw error;
+
+        await finishLogin();
+    } catch (error) {
+        showMsg(mfaMessage, /invalid|expired/i.test(String(error?.message))
+            ? 'Код не подошёл. Проверьте, что вводите текущий код из приложения.'
+            : (error.message ?? 'Не удалось подтвердить код.'), 'err');
+        mfaBtn.disabled = false;
+    }
+});
+
+document.getElementById('mfa-cancel')?.addEventListener('click', async () => {
+    await sb.auth.signOut();
+    location.reload();
 });
 
 /** Понятные подписи вместо английских ответов Supabase. */
@@ -115,7 +199,14 @@ function translate(error) {
     return text || 'Что-то пошло не так. Попробуйте ещё раз.';
 }
 
-/* Если пользователь уже вошёл — незачем показывать форму */
-authState().then(state => {
-    if (state.user) location.replace(nextPage(state.isAdmin));
+/* Если пользователь уже вошёл — незачем показывать форму.
+   Но недоведённый до конца двухфакторный вход нужно продолжить, а не пропустить. */
+authState().then(async (state) => {
+    if (!state.user) return;
+
+    if (await needsSecondFactor()) {
+        showMfaStep();
+        return;
+    }
+    location.replace(nextPage(state.isAdmin));
 });

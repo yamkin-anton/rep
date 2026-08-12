@@ -68,6 +68,7 @@
                     <button class="tab active" type="button" data-tab="editor">Добавить урок</button>
                     <button class="tab" type="button" data-tab="list">Материалы <span id="tab-count"></span></button>
                     <button class="tab" type="button" data-tab="students">Ученики <span id="tab-students"></span></button>
+                    <button class="tab" type="button" data-tab="security">Безопасность</button>
                 </div>
 
                 <!-- ------------------------------------------------ Редактор -->
@@ -204,6 +205,56 @@
                                 <tr><td colspan="5" class="muted">Загружаем...</td></tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- ------------------------------------------------ Безопасность -->
+                <div class="tab-panel" id="panel-security">
+                    <div class="card" style="max-width:620px;">
+                        <h2 style="font-size:1.4rem;">Двухфакторный вход</h2>
+                        <p class="muted" style="font-size:.95rem;">
+                            Дополнительный код при входе. Даже если пароль узнают, войти в панель
+                            без вашего телефона не смогут. Подходит любое приложение-аутентификатор:
+                            Яндекс Ключ, Google Authenticator, Aegis, 1Password.
+                        </p>
+
+                        <div id="mfa-status" class="muted">Проверяем...</div>
+
+                        <div id="mfa-setup" hidden style="margin-top:1.5rem;">
+                            <p><strong>Шаг 1.</strong> Отсканируйте код в приложении-аутентификаторе.</p>
+                            <div id="mfa-qr"
+                                style="background:#fff;padding:12px;border:1px solid var(--line);border-radius:var(--radius-sm);display:inline-block;">
+                            </div>
+                            <p style="margin-top:1rem;">Не получается отсканировать? Введите ключ вручную:</p>
+                            <code id="mfa-secret"
+                                style="display:block;word-break:break-all;background:#f4f7f5;padding:.7rem 1rem;border-radius:var(--radius-sm);font-size:.9rem;"></code>
+
+                            <p style="margin-top:1.4rem;"><strong>Шаг 2.</strong> Введите код из приложения.</p>
+                            <form id="mfa-verify-form">
+                                <label class="field">
+                                    <span>Код подтверждения</span>
+                                    <input type="text" name="code" inputmode="numeric" maxlength="6"
+                                        pattern="[0-9]{6}" required
+                                        style="letter-spacing:.4em;text-align:center;font-size:1.3rem;max-width:240px;">
+                                </label>
+                                <div style="display:flex;gap:.7rem;flex-wrap:wrap;">
+                                    <button class="btn" type="submit">Подтвердить и включить</button>
+                                    <button class="btn btn-ghost" type="button" id="mfa-abort">Отмена</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div style="margin-top:1.4rem;">
+                            <button class="btn" type="button" id="mfa-enable" hidden>Включить двухфакторный вход</button>
+                            <button class="btn btn-danger" type="button" id="mfa-disable" hidden>Отключить</button>
+                        </div>
+
+                        <div id="mfa-admin-message" class="form-msg"></div>
+
+                        <p class="muted" style="font-size:.86rem;margin:1.6rem 0 0;">
+                            Если телефон потеряется, доступ в панель придётся восстанавливать запросом
+                            в базе — команда есть в файле README.md.
+                        </p>
                     </div>
                 </div>
             </div>

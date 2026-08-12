@@ -74,6 +74,11 @@ create trigger lectures_touch_updated_at
 --     security definer — чтобы политики на profiles не вызывали рекурсию.
 -- ----------------------------------------------------------------------------
 
+-- Права администратора требуют подтверждённой сессии (aal2), если у него
+-- подключён двухфакторный вход. Без этой проверки MFA был бы бесполезен:
+-- сессия, не прошедшая второй шаг, остаётся полноценной.
+-- Условие «или факторов нет» защищает от блокировки: пока приложение-
+-- аутентификатор не подключено, вход работает как обычно.
 create or replace function public.is_admin()
 returns boolean
 language sql
@@ -84,6 +89,13 @@ as $$
     select exists (
         select 1 from public.profiles
         where id = auth.uid() and role = 'admin'
+    )
+    and (
+        coalesce(auth.jwt() ->> 'aal', 'aal1') = 'aal2'
+        or not exists (
+            select 1 from auth.mfa_factors
+            where user_id = auth.uid() and status = 'verified'
+        )
     );
 $$;
 

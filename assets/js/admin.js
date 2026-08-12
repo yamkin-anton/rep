@@ -45,7 +45,7 @@ let editing = null;
     guard.hidden = true;
     panel.hidden = false;
 
-    await Promise.all([loadLectures(), loadStudents()]);
+    await Promise.all([loadLectures(), loadStudents(), loadMfa()]);
 })();
 
 /* --------------------------------------------------------- Вкладки */
@@ -362,6 +362,104 @@ document.getElementById('students-rows').addEventListener('click', async (e) => 
 
     if (error) alert(`Не получилось: ${error.message}`);
     await loadStudents();
+});
+
+/* --------------------------------------------------------- Двухфакторный вход */
+
+const mfaStatus = document.getElementById('mfa-status');
+const mfaSetup = document.getElementById('mfa-setup');
+const mfaEnableBtn = document.getElementById('mfa-enable');
+const mfaDisableBtn = document.getElementById('mfa-disable');
+const mfaMsg = document.getElementById('mfa-admin-message');
+let enrollingFactorId = null;
+
+async function loadMfa() {
+    const { data, error } = await sb.auth.mfa.listFactors();
+    if (error) {
+        mfaStatus.textContent = 'Не удалось проверить состояние.';
+        return;
+    }
+
+    const active = (data.totp ?? []).find(f => f.status === 'verified');
+
+    mfaStatus.innerHTML = active
+        ? '<span class="status-dot status-ok">Включён — при входе запрашивается код</span>'
+        : '<span class="status-dot status-off">Выключен — вход только по паролю</span>';
+
+    mfaEnableBtn.hidden = Boolean(active);
+    mfaDisableBtn.hidden = !active;
+    mfaSetup.hidden = true;
+}
+
+mfaEnableBtn?.addEventListener('click', async () => {
+    hideMsg(mfaMsg);
+    mfaEnableBtn.disabled = true;
+
+    try {
+        // Незавершённые попытки накапливаются — убираем их перед новой.
+        const { data: existing } = await sb.auth.mfa.listFactors();
+        for (const factor of existing?.all ?? []) {
+            if (factor.status !== 'verified') await sb.auth.mfa.unenroll({ factorId: factor.id });
+        }
+
+        const { data, error } = await sb.auth.mfa.enroll({
+            factorType: 'totp',
+            friendlyName: `ITSchool ${new Date().toLocaleDateString('ru-RU')}`,
+        });
+        if (error) throw error;
+
+        enrollingFactorId = data.id;
+        document.getElementById('mfa-qr').innerHTML = `<img src="${escapeHtml(data.totp.qr_code)}" alt="QR-код" width="200" height="200">`;
+        document.getElementById('mfa-secret').textContent = data.totp.secret;
+        mfaSetup.hidden = false;
+        mfaEnableBtn.hidden = true;
+    } catch (error) {
+        showMsg(mfaMsg, `Не получилось начать подключение: ${error.message ?? error}`, 'err');
+    } finally {
+        mfaEnableBtn.disabled = false;
+    }
+});
+
+document.getElementById('mfa-verify-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const code = e.target.elements.code.value.trim();
+
+    if (!/^\d{6}$/.test(code)) {
+        showMsg(mfaMsg, 'Код состоит из шести цифр.', 'err');
+        return;
+    }
+
+    showMsg(mfaMsg, 'Проверяем код...', 'info');
+    try {
+        const { error } = await sb.auth.mfa.challengeAndVerify({ factorId: enrollingFactorId, code });
+        if (error) throw error;
+
+        showMsg(mfaMsg, 'Двухфакторный вход включён. В следующий раз спросим код.', 'ok');
+        e.target.reset();
+        await loadMfa();
+    } catch (error) {
+        showMsg(mfaMsg, /invalid|expired/i.test(String(error?.message))
+            ? 'Код не подошёл. Введите текущий код из приложения — он меняется каждые 30 секунд.'
+            : (error.message ?? 'Не удалось подтвердить код.'), 'err');
+    }
+});
+
+document.getElementById('mfa-abort')?.addEventListener('click', async () => {
+    if (enrollingFactorId) await sb.auth.mfa.unenroll({ factorId: enrollingFactorId });
+    enrollingFactorId = null;
+    hideMsg(mfaMsg);
+    await loadMfa();
+});
+
+mfaDisableBtn?.addEventListener('click', async () => {
+    if (!confirm('Отключить двухфакторный вход? Панель снова будет защищена только паролем.')) return;
+
+    const { data } = await sb.auth.mfa.listFactors();
+    for (const factor of data?.all ?? []) {
+        await sb.auth.mfa.unenroll({ factorId: factor.id });
+    }
+    showMsg(mfaMsg, 'Двухфакторный вход отключён.', 'info');
+    await loadMfa();
 });
 
 /* --------------------------------------------------------- Утилиты */
