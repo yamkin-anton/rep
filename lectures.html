@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Учебные материалы — ITSchool</title>
+    <meta name="description"
+        content="Видеоуроки, конспекты и файлы к занятиям по информатике: ОГЭ, ЕГЭ, Python. Репетитор Ямкина Елена Владимировна.">
+    <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/main.css">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container nav">
+            <a class="brand" href="index.html" aria-label="ITSchool — на главную">
+                <svg viewBox="0 0 120 140" fill="none" aria-hidden="true">
+                    <g stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M60 118V48" />
+                        <path d="M60 118 36 138" />
+                        <path d="M60 118 84 138" />
+                        <path d="M60 104 44 88V74" />
+                        <path d="M60 92 78 74V62" />
+                        <path d="M60 78 40 58" />
+                        <path d="M60 64 82 42" />
+                    </g>
+                    <g fill="currentColor">
+                        <circle cx="44" cy="68" r="6" />
+                        <circle cx="78" cy="56" r="6" />
+                        <circle cx="35" cy="53" r="6" />
+                        <circle cx="87" cy="37" r="6" />
+                        <circle cx="60" cy="42" r="6" />
+                    </g>
+                </svg>
+                <span class="brand-text">
+                    <span class="brand-name"><span>IT</span>School</span>
+                    <span class="brand-sub">ОГЭ • ЕГЭ • ИНФОРМАТИКА</span>
+                </span>
+            </a>
+
+            <button class="nav-toggle" type="button" aria-label="Открыть меню" aria-expanded="false">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round">
+                    <path d="M4 7h16M4 12h16M4 17h16" />
+                </svg>
+            </button>
+
+            <div class="nav-menu">
+                <nav class="nav-links">
+                    <a href="index.html">Главная</a>
+                    <a href="index.html#services">Услуги</a>
+                    <a href="lectures.html">Материалы</a>
+                    <a href="index.html#prices">Цены</a>
+                    <a href="index.html#contact">Контакты</a>
+                </nav>
+                <div class="nav-auth" id="nav-auth"></div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-head">
+            <div class="container">
+                <span class="eyebrow">Библиотека занятий</span>
+                <h1>Учебные материалы</h1>
+                <p>Видеоуроки, конспекты и архивы с задачами. Материалы с отметкой «Открыто»
+                    доступны всем, остальные — моим ученикам после входа на сайт.</p>
+            </div>
+        </section>
+
+        <section class="section" style="padding-top:2.5rem;">
+            <div class="container">
+                <div id="notice"></div>
+
+                <div class="toolbar">
+                    <div class="search-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" aria-hidden="true">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="m20 20-3.5-3.5" />
+                        </svg>
+                        <input type="search" id="search" placeholder="Поиск по названию и описанию"
+                            aria-label="Поиск по материалам" autocomplete="off">
+                    </div>
+                    <select id="sort" aria-label="Сортировка" style="width:auto;">
+                        <option value="new">Сначала новые</option>
+                        <option value="old">Сначала старые</option>
+                        <option value="title">По названию</option>
+                        <option value="popular">Сначала популярные</option>
+                    </select>
+                    <span class="muted" id="count" style="margin-left:auto;font-size:.9rem;"></span>
+                </div>
+
+                <div class="tag-filters" id="tag-filters"></div>
+
+                <div class="lectures-grid" id="lectures">
+                    <div class="skeleton"></div>
+                    <div class="skeleton"></div>
+                    <div class="skeleton"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-bottom" style="border:0;padding-top:0;">
+                <span>© <span id="year">2026</span> Ямкина Елена Владимировна • Ульяновск</span>
+                <span><a href="index.html">На главную</a></span>
+            </div>
+        </div>
+    </footer>
+
+    <button class="to-top" type="button" aria-label="Наверх">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M12 19V5M5 12l7-7 7 7" />
+        </svg>
+    </button>
+
+    <script type="module" src="assets/js/app.js"></script>
+    <script type="module" src="assets/js/lectures.js"></script>
+</body>
+
+</html>

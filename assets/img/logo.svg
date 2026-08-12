@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" fill="none" role="img" aria-label="ITSchool">
+  <g stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <!-- ствол и корни -->
+    <path d="M60 118V48"/>
+    <path d="M60 118 36 138"/>
+    <path d="M60 118 84 138"/>
+    <!-- ветви в стиле печатной платы -->
+    <path d="M60 104 44 88V74"/>
+    <path d="M60 92 78 74V62"/>
+    <path d="M60 78 40 58"/>
+    <path d="M60 64 82 42"/>
+  </g>
+  <g fill="currentColor">
+    <circle cx="44" cy="68" r="6"/>
+    <circle cx="78" cy="56" r="6"/>
+    <circle cx="35" cy="53" r="6"/>
+    <circle cx="87" cy="37" r="6"/>
+    <circle cx="60" cy="42" r="6"/>
+  </g>
+</svg>
