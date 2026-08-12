@@ -6,8 +6,9 @@
 import {
     sb, isConfigured, requireAuth, configWarning,
     escapeHtml, formatBytes, formatDate, showMsg, hideMsg, LEVELS,
-} from './app.js?v=1';
-import { BUCKET_COVERS, BUCKET_MATERIALS } from './config.js?v=1';
+} from './app.js?v=2';
+import { BUCKET_COVERS, BUCKET_MATERIALS } from './config.js?v=2';
+import { mergeContent } from './content.js?v=2';
 
 const guard = document.getElementById('admin-guard');
 const panel = document.getElementById('admin');
@@ -46,7 +47,7 @@ let editing = null;
     panel.hidden = false;
     myId = state.user.id;
 
-    await Promise.all([loadLectures(), loadStudents(), loadMfa()]);
+    await Promise.all([loadLectures(), loadStudents(), loadMfa(), loadSiteContent()]);
 })();
 
 /** id вошедшего администратора — чтобы не дать разжаловать самого себя. */
@@ -666,6 +667,147 @@ mfaDisableBtn?.addEventListener('click', async () => {
     }
     showMsg(mfaMsg, 'Двухфакторный вход отключён.', 'info');
     await loadMfa();
+});
+
+/* --------------------------------------------------------- Главная страница */
+
+const siteForm = document.getElementById('site-form');
+const siteMessage = document.getElementById('site-message');
+
+async function loadSiteContent() {
+    const { data } = await sb.from('site_content').select('content').eq('id', 1).maybeSingle();
+    fillSiteForm(mergeContent(data?.content));
+}
+
+function fillSiteForm(c) {
+    const setField = (name, value) => {
+        const el = siteForm.elements[name];
+        if (el) el.value = value ?? '';
+    };
+
+    setField('hero.eyebrow', c.hero.eyebrow);
+    setField('hero.title', c.hero.title);
+    setField('hero.lead', c.hero.lead);
+    setField('hero.badges', c.hero.badges.join('\n'));
+
+    setField('about.heading', c.about.heading);
+    setField('about.p1', c.about.p1);
+    setField('about.p2', c.about.p2);
+
+    setField('contacts.telegram', c.contacts.telegram);
+    setField('contacts.vk', c.contacts.vk);
+    setField('contacts.max', c.contacts.max);
+
+    // Повторяющиеся блоки строим заново, затем заполняем
+    document.getElementById('site-stats').innerHTML = c.stats.map((s, i) => `
+        <div class="form-row">
+            <label class="field"><span>Цифра ${i + 1}</span>
+                <input type="text" name="stats.${i}.num" value="${escapeHtml(s.num)}"></label>
+            <label class="field"><span>Подпись ${i + 1}</span>
+                <input type="text" name="stats.${i}.label" value="${escapeHtml(s.label)}"></label>
+        </div>`).join('');
+
+    document.getElementById('site-services').innerHTML = c.services.map((s, i) => `
+        <label class="field"><span>Направление ${i + 1} — название</span>
+            <input type="text" name="services.${i}.title" value="${escapeHtml(s.title)}"></label>
+        <label class="field"><span>Направление ${i + 1} — описание</span>
+            <textarea name="services.${i}.desc" rows="2">${escapeHtml(s.desc)}</textarea></label>`).join('');
+
+    document.getElementById('site-prices').innerHTML = c.prices.map((p, i) => `
+        <div class="form-row">
+            <label class="field"><span>Тариф ${i + 1} — название</span>
+                <input type="text" name="prices.${i}.name" value="${escapeHtml(p.name)}"></label>
+            <label class="field"><span>Цена</span>
+                <input type="text" name="prices.${i}.value" value="${escapeHtml(p.value)}"></label>
+            <label class="field"><span>Единица</span>
+                <input type="text" name="prices.${i}.unit" value="${escapeHtml(p.unit)}"></label>
+        </div>
+        <label class="field"><span>Что входит (по одному пункту в строке)</span>
+            <textarea name="prices.${i}.features" rows="3">${escapeHtml(p.features)}</textarea></label>`).join('');
+}
+
+/** Собирает вложенный объект из полей формы. */
+function collectSiteForm() {
+    const out = {};
+    siteForm.querySelectorAll('[name]').forEach(el => {
+        const name = el.getAttribute('name');
+        if (!/^(hero|stats|about|services|prices|contacts)\./.test(name)) return;
+
+        const value = name === 'hero.badges'
+            ? el.value.split('\n').map(s => s.trim()).filter(Boolean)
+            : el.value.trim();
+
+        const parts = name.split('.');
+        let cur = out;
+        for (let i = 0; i < parts.length - 1; i++) {
+            const key = parts[i];
+            if (cur[key] === undefined) cur[key] = /^\d+$/.test(parts[i + 1]) ? [] : {};
+            cur = cur[key];
+        }
+        cur[parts[parts.length - 1]] = value;
+    });
+    return out;
+}
+
+/* Три ступени подтверждения */
+const step1Btn = document.getElementById('site-step1');
+const step2Box = document.getElementById('site-step2');
+const step3Box = document.getElementById('site-step3');
+const confirmCheck = document.getElementById('site-confirm-check');
+const confirmWord = document.getElementById('site-confirm-word');
+const applyBtn = document.getElementById('site-apply');
+
+function resetSiteSteps() {
+    step2Box.hidden = true;
+    step3Box.hidden = true;
+    confirmCheck.checked = false;
+    confirmWord.value = '';
+    applyBtn.disabled = true;
+    step1Btn.disabled = false;
+}
+
+step1Btn?.addEventListener('click', () => {
+    step2Box.hidden = false;
+    step1Btn.disabled = true;
+    hideMsg(siteMessage);
+    confirmCheck.focus();
+});
+
+confirmCheck?.addEventListener('change', () => {
+    step3Box.hidden = !confirmCheck.checked;
+    if (confirmCheck.checked) confirmWord.focus();
+    else { confirmWord.value = ''; applyBtn.disabled = true; }
+});
+
+confirmWord?.addEventListener('input', () => {
+    applyBtn.disabled = confirmWord.value.trim() !== 'ГЛАВНАЯ';
+});
+
+applyBtn?.addEventListener('click', async () => {
+    if (confirmWord.value.trim() !== 'ГЛАВНАЯ') return;
+
+    applyBtn.disabled = true;
+    showMsg(siteMessage, 'Сохраняем изменения главной...', 'info');
+
+    const { error } = await sb.from('site_content')
+        .update({ content: collectSiteForm(), updated_at: new Date().toISOString() })
+        .eq('id', 1);
+
+    if (error) {
+        showMsg(siteMessage, `Не получилось сохранить: ${error.message}`, 'err');
+        applyBtn.disabled = false;
+        return;
+    }
+
+    showMsg(siteMessage, 'Готово. Главная страница обновлена — откройте её, чтобы проверить.', 'ok');
+    resetSiteSteps();
+});
+
+document.getElementById('site-reset')?.addEventListener('click', () => {
+    if (!confirm('Подставить в форму тексты по умолчанию? Это ещё не применит их — нужно пройти три шага подтверждения.')) return;
+    fillSiteForm(mergeContent({}));
+    resetSiteSteps();
+    showMsg(siteMessage, 'В форму подставлены тексты по умолчанию. Чтобы применить — пройдите три шага.', 'info');
 });
 
 /* --------------------------------------------------------- Утилиты */

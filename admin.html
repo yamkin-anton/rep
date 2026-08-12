@@ -68,6 +68,7 @@
                     <button class="tab active" type="button" data-tab="editor">Добавить урок</button>
                     <button class="tab" type="button" data-tab="list">Материалы <span id="tab-count"></span></button>
                     <button class="tab" type="button" data-tab="students">Ученики <span id="tab-students"></span></button>
+                    <button class="tab" type="button" data-tab="site">Главная страница</button>
                     <button class="tab" type="button" data-tab="security">Безопасность</button>
                 </div>
 
@@ -238,6 +239,96 @@
                     </div>
                 </div>
 
+                <!-- ------------------------------------------------ Главная страница -->
+                <div class="tab-panel" id="panel-site">
+                    <div class="banner" style="max-width:760px;">
+                        Здесь меняется <strong>главная страница сайта</strong> — то, что видят все посетители.
+                        Пустое поле означает «оставить текст по умолчанию». Изменения применяются
+                        только после трёх подтверждений внизу формы.
+                        <a href="index.html" target="_blank" rel="noopener">Открыть главную в новой вкладке</a>.
+                    </div>
+
+                    <form id="site-form" style="max-width:760px;">
+                        <fieldset style="border:1px solid var(--line);border-radius:var(--radius);padding:1.4rem;margin:0 0 1.4rem;">
+                            <legend style="font-weight:700;padding:0 .5rem;">Первый экран</legend>
+                            <label class="field"><span>Надпись над заголовком</span>
+                                <input type="text" name="hero.eyebrow" maxlength="80"></label>
+                            <label class="field"><span>Заголовок</span>
+                                <input type="text" name="hero.title" maxlength="160">
+                                <span class="field-hint">Если менять — зелёная подсветка слова пропадёт, будет обычный текст.</span></label>
+                            <label class="field"><span>Описание под заголовком</span>
+                                <textarea name="hero.lead" rows="3" maxlength="400"></textarea></label>
+                            <label class="field"><span>Метки (по одной в строке)</span>
+                                <textarea name="hero.badges" rows="3"></textarea></label>
+                        </fieldset>
+
+                        <fieldset style="border:1px solid var(--line);border-radius:var(--radius);padding:1.4rem;margin:0 0 1.4rem;">
+                            <legend style="font-weight:700;padding:0 .5rem;">Цифры</legend>
+                            <div id="site-stats"></div>
+                        </fieldset>
+
+                        <fieldset style="border:1px solid var(--line);border-radius:var(--radius);padding:1.4rem;margin:0 0 1.4rem;">
+                            <legend style="font-weight:700;padding:0 .5rem;">Обо мне</legend>
+                            <label class="field"><span>Заголовок</span>
+                                <input type="text" name="about.heading" maxlength="160"></label>
+                            <label class="field"><span>Первый абзац</span>
+                                <textarea name="about.p1" rows="3"></textarea></label>
+                            <label class="field"><span>Второй абзац</span>
+                                <textarea name="about.p2" rows="3"></textarea></label>
+                        </fieldset>
+
+                        <fieldset style="border:1px solid var(--line);border-radius:var(--radius);padding:1.4rem;margin:0 0 1.4rem;">
+                            <legend style="font-weight:700;padding:0 .5rem;">Направления подготовки</legend>
+                            <div id="site-services"></div>
+                        </fieldset>
+
+                        <fieldset style="border:1px solid var(--line);border-radius:var(--radius);padding:1.4rem;margin:0 0 1.4rem;">
+                            <legend style="font-weight:700;padding:0 .5rem;">Цены</legend>
+                            <div id="site-prices"></div>
+                        </fieldset>
+
+                        <fieldset style="border:1px solid var(--line);border-radius:var(--radius);padding:1.4rem;margin:0 0 1.4rem;">
+                            <legend style="font-weight:700;padding:0 .5rem;">Ссылки для связи</legend>
+                            <label class="field"><span>Telegram</span>
+                                <input type="url" name="contacts.telegram"></label>
+                            <label class="field"><span>ВКонтакте</span>
+                                <input type="url" name="contacts.vk"></label>
+                            <label class="field"><span>MAX</span>
+                                <input type="url" name="contacts.max"></label>
+                        </fieldset>
+
+                        <!-- Три ступени подтверждения -->
+                        <div class="card" style="border-color:var(--warn);background:#fff9f0;">
+                            <h3 style="margin-bottom:.4rem;">Применить изменения главной</h3>
+                            <p class="muted" style="font-size:.92rem;margin-bottom:1rem;">
+                                Три шага защиты от случайного изменения. Пройдите их по порядку.</p>
+
+                            <button class="btn" type="button" id="site-step1">Шаг 1 — начать применение</button>
+
+                            <div id="site-step2" hidden style="margin-top:1rem;">
+                                <label class="checkbox">
+                                    <input type="checkbox" id="site-confirm-check">
+                                    <span>Шаг 2 — я понимаю, что изменения увидят все посетители сайта.</span>
+                                </label>
+                            </div>
+
+                            <div id="site-step3" hidden style="margin-top:.6rem;">
+                                <label class="field" style="max-width:320px;">
+                                    <span>Шаг 3 — впишите слово <strong>ГЛАВНАЯ</strong> заглавными буквами</span>
+                                    <input type="text" id="site-confirm-word" autocomplete="off" placeholder="ГЛАВНАЯ">
+                                </label>
+                                <button class="btn btn-lg" type="button" id="site-apply" disabled>Применить изменения</button>
+                            </div>
+
+                            <div id="site-message" class="form-msg"></div>
+
+                            <p style="margin:1rem 0 0;">
+                                <button class="btn btn-ghost btn-sm" type="button" id="site-reset">Вернуть тексты по умолчанию</button>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+
                 <!-- ------------------------------------------------ Безопасность -->
                 <div class="tab-panel" id="panel-security">
                     <div class="card" style="max-width:620px;">
@@ -304,8 +395,8 @@
         </div>
     </footer>
 
-    <script type="module" src="assets/js/app.js?v=1"></script>
-    <script type="module" src="assets/js/admin.js?v=1"></script>
+    <script type="module" src="assets/js/app.js?v=2"></script>
+    <script type="module" src="assets/js/admin.js?v=2"></script>
 </body>
 
 </html>

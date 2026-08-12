@@ -275,6 +275,39 @@ grant execute on function public.admin_delete_users(uuid[]) to authenticated;
 
 
 -- ----------------------------------------------------------------------------
+--  7б. Редактируемое содержимое главной страницы
+--     Одна строка с JSON. Читают все (страница подставляет тексты),
+--     меняет только администратор через панель управления.
+-- ----------------------------------------------------------------------------
+
+create table if not exists public.site_content (
+    id          integer primary key default 1,
+    content     jsonb not null default '{}'::jsonb,
+    updated_at  timestamptz not null default now(),
+    constraint site_content_single_row check (id = 1)
+);
+
+insert into public.site_content (id, content)
+values (1, '{}'::jsonb)
+on conflict (id) do nothing;
+
+alter table public.site_content enable row level security;
+
+drop policy if exists "site_content: читают все" on public.site_content;
+create policy "site_content: читают все"
+    on public.site_content for select
+    using (true);
+
+drop policy if exists "site_content: меняет админ" on public.site_content;
+create policy "site_content: меняет админ"
+    on public.site_content for update
+    using (public.is_admin())
+    with check (public.is_admin());
+
+grant select on public.site_content to anon, authenticated;
+
+
+-- ----------------------------------------------------------------------------
 --  8. Хранилище файлов
 --     covers    — обложки, публичный бакет (картинки открыты всем)
 --     materials — zip-архивы, закрытый бакет: ссылки выдаются на время

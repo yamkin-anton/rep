@@ -2,7 +2,28 @@
    Главная страница: выбор направления и отправка заявки.
    ========================================================================== */
 
-import { showMsg } from './app.js?v=1';
+import { showMsg, sb, isConfigured } from './app.js?v=2';
+import { applyContent } from './content.js?v=2';
+
+/* --------------------------------------------------------- Тексты главной */
+
+/** Подставляет отредактированные в админке тексты. При любой ошибке
+    остаётся вёрстка по умолчанию из index.html. */
+(async function loadSiteContent() {
+    if (!isConfigured) return;
+    try {
+        const { data } = await sb
+            .from('site_content')
+            .select('content')
+            .eq('id', 1)
+            .maybeSingle();
+        if (data?.content && Object.keys(data.content).length) {
+            applyContent(data.content);
+        }
+    } catch {
+        /* молча оставляем тексты по умолчанию */
+    }
+})();
 
 const messageField = document.getElementById('message-field');
 const contactSection = document.getElementById('contact');

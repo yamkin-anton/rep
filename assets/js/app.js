@@ -4,7 +4,7 @@
    ========================================================================== */
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-import { SUPABASE_URL, SUPABASE_ANON_KEY, CONTACT_TELEGRAM } from './config.js?v=1';
+import { SUPABASE_URL, SUPABASE_ANON_KEY, CONTACT_TELEGRAM } from './config.js?v=2';
 
 /* --------------------------------------------------------- Клиент */
 

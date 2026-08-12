@@ -2,7 +2,7 @@
    Вход и регистрация ученика.
    ========================================================================== */
 
-import { sb, isConfigured, authState, configWarning, showMsg, hideMsg, passwordProblem } from './app.js?v=1';
+import { sb, isConfigured, authState, configWarning, showMsg, hideMsg, passwordProblem } from './app.js?v=2';
 
 const form = document.getElementById('auth-form');
 const message = document.getElementById('auth-message');
