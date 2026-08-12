@@ -1475,6 +1475,27 @@ tbody tr:hover {
     flex-wrap: wrap;
 }
 
+/* Панель действий над группой выбранных учеников */
+.bulk-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    background: var(--green-50);
+    border: 1px solid var(--green-300);
+    border-radius: var(--radius-sm);
+    padding: .7rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.student-check,
+#check-all {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--green);
+    cursor: pointer;
+}
+
 .status-dot {
     display: inline-flex;
     align-items: center;

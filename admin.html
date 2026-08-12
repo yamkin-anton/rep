@@ -190,11 +190,40 @@
                 <!-- ------------------------------------------------ Ученики -->
                 <div class="tab-panel" id="panel-students">
                     <p class="muted">«Открыть доступ» — ученик увидит закрытые материалы.
-                        «Сбросить пароль» — на его почту придёт ссылка, по которой он задаст новый пароль.</p>
+                        «Сбросить пароль» — на его почту придёт ссылка для смены пароля.
+                        «Удалить» — учётная запись стирается безвозвратно. Отметьте несколько
+                        галочками, чтобы сделать это сразу для группы.</p>
+
+                    <div class="toolbar">
+                        <label style="display:flex;align-items:center;gap:.5rem;font-size:.9rem;">
+                            <span class="muted">Сортировка:</span>
+                            <select id="students-sort" style="width:auto;">
+                                <option value="new">Сначала новые</option>
+                                <option value="old">Сначала старые</option>
+                                <option value="name">По имени (А–Я)</option>
+                                <option value="waiting">Сначала ждут доступа</option>
+                                <option value="approved">Сначала с доступом</option>
+                            </select>
+                        </label>
+                        <span class="muted" id="students-count" style="margin-left:auto;font-size:.9rem;"></span>
+                    </div>
+
+                    <div class="bulk-bar" id="bulk-bar" hidden>
+                        <span id="bulk-count" style="font-weight:600;"></span>
+                        <div class="row-actions" style="margin-left:auto;">
+                            <button class="btn btn-sm btn-outline" data-bulk="approve">Открыть доступ</button>
+                            <button class="btn btn-sm btn-ghost" data-bulk="revoke">Закрыть доступ</button>
+                            <button class="btn btn-sm btn-ghost" data-bulk="reset">Сбросить пароль</button>
+                            <button class="btn btn-sm btn-danger" data-bulk="delete">Удалить</button>
+                        </div>
+                    </div>
+
                     <div class="table-wrap">
                         <table>
                             <thead>
                                 <tr>
+                                    <th style="width:40px;"><input type="checkbox" id="check-all"
+                                        aria-label="Выбрать всех"></th>
                                     <th>Ученик</th>
                                     <th>Почта</th>
                                     <th>Регистрация</th>
@@ -203,7 +232,7 @@
                                 </tr>
                             </thead>
                             <tbody id="students-rows">
-                                <tr><td colspan="5" class="muted">Загружаем...</td></tr>
+                                <tr><td colspan="6" class="muted">Загружаем...</td></tr>
                             </tbody>
                         </table>
                     </div>

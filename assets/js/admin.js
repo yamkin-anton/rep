@@ -44,9 +44,13 @@ let editing = null;
 
     guard.hidden = true;
     panel.hidden = false;
+    myId = state.user.id;
 
     await Promise.all([loadLectures(), loadStudents(), loadMfa()]);
 })();
+
+/** id вошедшего администратора — чтобы не дать разжаловать самого себя. */
+let myId = null;
 
 /* --------------------------------------------------------- Вкладки */
 
@@ -314,6 +318,9 @@ async function uploadArchive(file) {
 
 /* --------------------------------------------------------- Ученики */
 
+let students = [];
+const selected = new Set();
+
 async function loadStudents() {
     const { data, error } = await sb
         .from('profiles')
@@ -322,38 +329,132 @@ async function loadStudents() {
 
     const rows = document.getElementById('students-rows');
     if (error) {
-        rows.innerHTML = `<tr><td colspan="5">Ошибка: ${escapeHtml(error.message)}</td></tr>`;
+        rows.innerHTML = `<tr><td colspan="6">Ошибка: ${escapeHtml(error.message)}</td></tr>`;
         return;
     }
 
-    const students = data ?? [];
+    students = data ?? [];
+    // Выбор сбрасываем на удалённых/исчезнувших учениках
+    for (const id of [...selected]) {
+        if (!students.some(s => s.id === id)) selected.delete(id);
+    }
+
     const waiting = students.filter(s => s.role !== 'admin' && !s.approved).length;
     document.getElementById('tab-students').textContent = waiting ? `(${waiting} ждут)` : `(${students.length})`;
 
+    renderStudents();
+}
+
+/** Порядок строк по выбранному критерию. Администраторы всегда сверху. */
+function sortedStudents() {
+    const mode = document.getElementById('students-sort').value;
+    const comparators = {
+        new: (a, b) => new Date(b.created_at) - new Date(a.created_at),
+        old: (a, b) => new Date(a.created_at) - new Date(b.created_at),
+        name: (a, b) => (a.full_name || 'я').localeCompare(b.full_name || 'я', 'ru'),
+        waiting: (a, b) => Number(a.approved) - Number(b.approved) || new Date(b.created_at) - new Date(a.created_at),
+        approved: (a, b) => Number(b.approved) - Number(a.approved) || new Date(b.created_at) - new Date(a.created_at),
+    };
+    return [...students].sort((a, b) =>
+        Number(b.role === 'admin') - Number(a.role === 'admin')
+        || (comparators[mode] ?? comparators.new)(a, b));
+}
+
+function renderStudents() {
+    const rows = document.getElementById('students-rows');
+    const list = sortedStudents();
+
+    document.getElementById('students-count').textContent =
+        `${students.length} ${plural(students.length, 'ученик', 'ученика', 'учеников')}`;
+
     if (!students.length) {
-        rows.innerHTML = '<tr><td colspan="5" class="muted">Пока никто не зарегистрировался.</td></tr>';
+        rows.innerHTML = '<tr><td colspan="6" class="muted">Пока никто не зарегистрировался.</td></tr>';
+        updateBulkBar();
         return;
     }
 
-    rows.innerHTML = students.map(person => `
-        <tr>
+    rows.innerHTML = list.map(person => {
+        const isAdmin = person.role === 'admin';
+        const checkbox = isAdmin
+            ? ''
+            : `<input type="checkbox" class="student-check" data-id="${person.id}"
+                 ${selected.has(person.id) ? 'checked' : ''} aria-label="Выбрать">`;
+
+        // У администраторов вместо строки действий — либо пометка «это вы»,
+        // либо кнопка снять права (себя разжаловать нельзя: иначе можно
+        // остаться совсем без администраторов).
+        const adminActions = person.id === myId
+            ? '<span class="muted" style="font-size:.85rem;">это вы</span>'
+            : `<button class="btn btn-sm btn-danger" data-demote="${person.id}"
+                 data-name="${escapeHtml(person.full_name || person.email || '')}">Снять права админа</button>`;
+
+        const actions = isAdmin ? adminActions : `
+            <div class="row-actions">
+                <button class="btn btn-sm ${person.approved ? 'btn-danger' : 'btn-outline'}"
+                    data-approve="${person.id}" data-value="${person.approved ? '0' : '1'}">
+                    ${person.approved ? 'Закрыть доступ' : 'Открыть доступ'}
+                </button>
+                <button class="btn btn-sm btn-ghost"
+                    data-reset="${escapeHtml(person.email ?? '')}">Сбросить пароль</button>
+                <button class="btn btn-sm btn-danger"
+                    data-delete="${person.id}" data-name="${escapeHtml(person.full_name || person.email || '')}">Удалить</button>
+            </div>`;
+
+        return `<tr${selected.has(person.id) ? ' style="background:#f4fbf5;"' : ''}>
+            <td>${checkbox}</td>
             <td><strong>${escapeHtml(person.full_name || 'Без имени')}</strong>
-                ${person.role === 'admin' ? '<br><span class="tag">администратор</span>' : ''}</td>
+                ${isAdmin ? '<br><span class="tag">администратор</span>' : ''}</td>
             <td>${escapeHtml(person.email ?? '')}</td>
             <td>${formatDate(person.created_at)}</td>
             <td><span class="status-dot ${person.approved ? 'status-ok' : 'status-off'}">
                 ${person.approved ? 'Открыт' : 'Закрыт'}</span></td>
-            <td>${person.role === 'admin' ? '' : `
-                <div class="row-actions">
-                    <button class="btn btn-sm ${person.approved ? 'btn-danger' : 'btn-outline'}"
-                        data-approve="${person.id}" data-value="${person.approved ? '0' : '1'}">
-                        ${person.approved ? 'Закрыть доступ' : 'Открыть доступ'}
-                    </button>
-                    <button class="btn btn-sm btn-ghost"
-                        data-reset="${escapeHtml(person.email ?? '')}">Сбросить пароль</button>
-                </div>`}</td>
-        </tr>`).join('');
+            <td>${actions}</td>
+        </tr>`;
+    }).join('');
+
+    syncCheckAll();
+    updateBulkBar();
 }
+
+/* --------------------------------------------------------- Выбор */
+
+function selectableIds() {
+    return students.filter(s => s.role !== 'admin').map(s => s.id);
+}
+
+function syncCheckAll() {
+    const all = selectableIds();
+    const box = document.getElementById('check-all');
+    box.checked = all.length > 0 && all.every(id => selected.has(id));
+    box.indeterminate = !box.checked && all.some(id => selected.has(id));
+}
+
+function updateBulkBar() {
+    const bar = document.getElementById('bulk-bar');
+    bar.hidden = selected.size === 0;
+    document.getElementById('bulk-count').textContent =
+        `Выбрано: ${selected.size} ${plural(selected.size, 'ученик', 'ученика', 'учеников')}`;
+}
+
+document.getElementById('students-sort').addEventListener('change', renderStudents);
+
+document.getElementById('check-all').addEventListener('change', (e) => {
+    const ids = selectableIds();
+    if (e.target.checked) ids.forEach(id => selected.add(id));
+    else ids.forEach(id => selected.delete(id));
+    renderStudents();
+});
+
+document.getElementById('students-rows').addEventListener('change', (e) => {
+    const check = e.target.closest('.student-check');
+    if (!check) return;
+    if (check.checked) selected.add(check.dataset.id);
+    else selected.delete(check.dataset.id);
+    // Подсветку строки и панель обновляем без полной перерисовки
+    check.closest('tr').style.background = check.checked ? '#f4fbf5' : '';
+    syncCheckAll();
+    updateBulkBar();
+});
 
 document.getElementById('students-rows').addEventListener('click', async (e) => {
     const approveBtn = e.target.closest('button[data-approve]');
@@ -362,39 +463,111 @@ document.getElementById('students-rows').addEventListener('click', async (e) => 
         const { error } = await sb.from('profiles')
             .update({ approved: approveBtn.dataset.value === '1' })
             .eq('id', approveBtn.dataset.approve);
-
         if (error) alert(`Не получилось: ${error.message}`);
         await loadStudents();
         return;
     }
 
     const resetBtn = e.target.closest('button[data-reset]');
-    if (resetBtn) await sendReset(resetBtn);
+    if (resetBtn) return sendReset(resetBtn.dataset.reset, resetBtn);
+
+    const deleteBtn = e.target.closest('button[data-delete]');
+    if (deleteBtn) return deleteUsers([deleteBtn.dataset.delete], deleteBtn.dataset.name);
+
+    const demoteBtn = e.target.closest('button[data-demote]');
+    if (demoteBtn) return demoteAdmin(demoteBtn.dataset.demote, demoteBtn.dataset.name);
 });
 
+/** Возвращает администратора в обычные ученики. Себя разжаловать нельзя. */
+async function demoteAdmin(id, name) {
+    if (id === myId) return;
+    if (!confirm(`Снять права администратора у «${name ?? ''}»? Он останется учеником с доступом к материалам, но потеряет доступ к панели управления.`)) return;
+
+    const { error } = await sb.from('profiles').update({ role: 'student' }).eq('id', id);
+    if (error) {
+        alert(`Не получилось: ${error.message}`);
+        return;
+    }
+    await loadStudents();
+}
+
+/* --------------------------------------------------------- Действия над группой */
+
+document.getElementById('bulk-bar').addEventListener('click', async (e) => {
+    const button = e.target.closest('button[data-bulk]');
+    if (!button) return;
+
+    const ids = [...selected];
+    if (!ids.length) return;
+    const emails = students.filter(s => ids.includes(s.id)).map(s => s.email).filter(Boolean);
+
+    switch (button.dataset.bulk) {
+        case 'approve': return setApproval(ids, true);
+        case 'revoke': return setApproval(ids, false);
+        case 'reset': return sendResetMany(emails);
+        case 'delete': return deleteUsers(ids);
+    }
+});
+
+async function setApproval(ids, approved) {
+    const { error } = await sb.from('profiles').update({ approved }).in('id', ids);
+    if (error) alert(`Не получилось: ${error.message}`);
+    await loadStudents();
+}
+
 /** Отправляет ученику письмо со ссылкой для сброса пароля. */
-async function sendReset(button) {
-    const email = button.dataset.reset;
+async function sendReset(email, button) {
     if (!email) return;
     if (!confirm(`Отправить ученику ${email} письмо со ссылкой для сброса пароля?`)) return;
 
-    button.disabled = true;
-    const original = button.textContent;
-    button.textContent = 'Отправляем...';
-
+    if (button) { button.disabled = true; button.textContent = 'Отправляем...'; }
     const { error } = await sb.auth.resetPasswordForEmail(email, {
         redirectTo: new URL('reset-password.html', location.href).href,
     });
 
     if (error) {
         alert(`Не получилось отправить письмо: ${error.message}`);
-    } else {
+        if (button) { button.textContent = 'Сбросить пароль'; button.disabled = false; }
+    } else if (button) {
         button.textContent = 'Письмо отправлено';
-        setTimeout(() => { button.textContent = original; button.disabled = false; }, 4000);
+        setTimeout(() => { button.textContent = 'Сбросить пароль'; button.disabled = false; }, 4000);
+    }
+}
+
+async function sendResetMany(emails) {
+    if (!emails.length) return;
+    if (!confirm(`Отправить ссылку для сброса пароля выбранным ученикам (${emails.length})?`)) return;
+
+    let ok = 0;
+    let failed = 0;
+    for (const email of emails) {
+        const { error } = await sb.auth.resetPasswordForEmail(email, {
+            redirectTo: new URL('reset-password.html', location.href).href,
+        });
+        error ? failed++ : ok++;
+    }
+    alert(failed
+        ? `Отправлено писем: ${ok}. Не удалось: ${failed}.\nВстроенная почта Supabase шлёт не больше 2 писем в час — остальным отправьте позже или подключите свой почтовый сервис.`
+        : `Отправлено писем: ${ok}.`);
+}
+
+async function deleteUsers(ids, singleName) {
+    const question = ids.length === 1
+        ? `Удалить учётную запись «${singleName ?? ''}» безвозвратно? Ученик больше не сможет войти.`
+        : `Удалить безвозвратно выбранные учётные записи (${ids.length})? Действие необратимо.`;
+    if (!confirm(question)) return;
+
+    const { data, error } = await sb.rpc('admin_delete_users', { targets: ids });
+    if (error) {
+        alert(`Не получилось удалить: ${error.message}`);
         return;
     }
-    button.textContent = original;
-    button.disabled = false;
+
+    selected.clear();
+    await loadStudents();
+    if (typeof data === 'number' && data < ids.length) {
+        alert(`Удалено: ${data} из ${ids.length}. Администраторов удалить нельзя.`);
+    }
 }
 
 /* --------------------------------------------------------- Двухфакторный вход */
@@ -501,6 +674,14 @@ function parseTags(value) {
     return [...new Set(
         value.split(',').map(tag => tag.trim()).filter(Boolean)
     )];
+}
+
+function plural(n, one, few, many) {
+    const mod10 = n % 10;
+    const mod100 = n % 100;
+    if (mod10 === 1 && mod100 !== 11) return one;
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+    return many;
 }
 
 function parseLinks(value) {

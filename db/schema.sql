@@ -240,6 +240,40 @@ $$;
 grant execute on function public.increment_views(uuid) to anon, authenticated;
 
 
+-- Удаление учётных записей.
+-- Стереть запись из auth.users может только владелец схемы (postgres),
+-- поэтому функция объявлена security definer. Внутри проверяем, что вызвал
+-- администратор (is_admin() требует подтверждённую сессию), и защищаем
+-- администраторов от удаления. Профиль ученика удалится каскадом по внешнему
+-- ключу. Возвращаем число фактически удалённых записей.
+create or replace function public.admin_delete_users(targets uuid[])
+returns integer
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    deleted integer;
+begin
+    if not public.is_admin() then
+        raise exception 'Только администратор может удалять пользователей';
+    end if;
+
+    delete from auth.users u
+    where u.id = any(targets)
+      and not exists (
+          select 1 from public.profiles p
+          where p.id = u.id and p.role = 'admin'
+      );
+
+    get diagnostics deleted = row_count;
+    return deleted;
+end;
+$$;
+
+grant execute on function public.admin_delete_users(uuid[]) to authenticated;
+
+
 -- ----------------------------------------------------------------------------
 --  8. Хранилище файлов
 --     covers    — обложки, публичный бакет (картинки открыты всем)
