@@ -2,12 +2,13 @@
    Вход и регистрация ученика.
    ========================================================================== */
 
-import { sb, isConfigured, authState, configWarning, showMsg, hideMsg, passwordProblem } from './app.js';
+import { sb, isConfigured, authState, configWarning, showMsg, hideMsg, passwordProblem } from './app.js?v=1';
 
 const form = document.getElementById('auth-form');
 const message = document.getElementById('auth-message');
 const submit = document.getElementById('submit-btn');
 const nameField = document.getElementById('name-field');
+const confirmField = document.getElementById('confirm-field');
 const title = document.getElementById('form-title');
 const lead = document.getElementById('form-lead');
 const password = form.elements.password;
@@ -42,7 +43,9 @@ document.querySelectorAll('.tab[data-mode]').forEach(tab => {
 
         const signup = mode === 'signup';
         nameField.hidden = !signup;
+        confirmField.hidden = !signup;
         form.elements.full_name.required = signup;
+        form.elements.confirm.required = signup;
         password.autocomplete = signup ? 'new-password' : 'current-password';
         title.textContent = signup ? 'Регистрация ученика' : 'Вход для учеников';
         lead.textContent = signup
@@ -72,6 +75,10 @@ form.addEventListener('submit', async (e) => {
     const weak = mode === 'signup' ? passwordProblem(pass) : (pass ? null : 'Введите пароль.');
     if (weak) {
         showMsg(message, weak, 'err');
+        return;
+    }
+    if (mode === 'signup' && pass !== form.elements.confirm.value) {
+        showMsg(message, 'Пароли не совпадают — введите одинаковый пароль в обоих полях.', 'err');
         return;
     }
     if (mode === 'signup' && !fullName) {

@@ -10,8 +10,8 @@ import {
     sb, isConfigured, authState, configWarning, videoEmbed,
     escapeHtml, formatBytes, formatDate, formatDuration,
     icons, LEVELS, CONTACT_TELEGRAM,
-} from './app.js';
-import { BUCKET_MATERIALS } from './config.js';
+} from './app.js?v=1';
+import { BUCKET_MATERIALS } from './config.js?v=1';
 
 const box = document.getElementById('lesson');
 const id = new URLSearchParams(location.search).get('id');

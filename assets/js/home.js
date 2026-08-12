@@ -2,7 +2,7 @@
    Главная страница: выбор направления и отправка заявки.
    ========================================================================== */
 
-import { showMsg } from './app.js';
+import { showMsg } from './app.js?v=1';
 
 const messageField = document.getElementById('message-field');
 const contactSection = document.getElementById('contact');

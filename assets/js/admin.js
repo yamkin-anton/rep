@@ -6,8 +6,8 @@
 import {
     sb, isConfigured, requireAuth, configWarning,
     escapeHtml, formatBytes, formatDate, showMsg, hideMsg, LEVELS,
-} from './app.js';
-import { BUCKET_COVERS, BUCKET_MATERIALS } from './config.js';
+} from './app.js?v=1';
+import { BUCKET_COVERS, BUCKET_MATERIALS } from './config.js?v=1';
 
 const guard = document.getElementById('admin-guard');
 const panel = document.getElementById('admin');

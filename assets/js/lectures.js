@@ -5,7 +5,7 @@
 import {
     sb, isConfigured, authState, configWarning,
     escapeHtml, formatDate, formatDuration, icons, LEVELS, CONTACT_TELEGRAM,
-} from './app.js';
+} from './app.js?v=1';
 
 const grid = document.getElementById('lectures');
 const tagBox = document.getElementById('tag-filters');
