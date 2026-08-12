@@ -2,7 +2,7 @@
    Вход и регистрация ученика.
    ========================================================================== */
 
-import { sb, isConfigured, authState, configWarning, showMsg, hideMsg } from './app.js';
+import { sb, isConfigured, authState, configWarning, showMsg, hideMsg, passwordProblem } from './app.js';
 
 const form = document.getElementById('auth-form');
 const message = document.getElementById('auth-message');
@@ -121,14 +121,35 @@ async function finishLogin() {
     location.href = nextPage(state.isAdmin);
 }
 
-/** Требования к паролю совпадают с настройками проекта Supabase. */
-function passwordProblem(value) {
-    if (value.length < 10) return 'Пароль должен быть не короче 10 символов.';
-    if (!/[a-zа-я]/.test(value)) return 'Добавьте в пароль строчную букву.';
-    if (!/[A-ZА-Я]/.test(value)) return 'Добавьте в пароль заглавную букву.';
-    if (!/[0-9]/.test(value)) return 'Добавьте в пароль хотя бы одну цифру.';
-    return null;
-}
+/* --------------------------------------------------------- Забыли пароль */
+
+const forgotLink = document.getElementById('forgot-link');
+
+forgotLink?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const email = form.elements.email.value.trim();
+
+    if (!email) {
+        showMsg(message, 'Введите почту в поле выше — на неё придёт ссылка для сброса.', 'info');
+        form.elements.email.focus();
+        return;
+    }
+
+    forgotLink.style.pointerEvents = 'none';
+    showMsg(message, 'Отправляем ссылку для сброса...', 'info');
+
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: new URL('reset-password.html', location.href).href,
+    });
+
+    // Ответ намеренно одинаков, есть такая почта или нет — чтобы нельзя было
+    // подобрать список зарегистрированных адресов.
+    showMsg(message, error
+        ? 'Не получилось отправить письмо. Попробуйте позже.'
+        : 'Если такая почта зарегистрирована, на неё отправлена ссылка для сброса пароля.',
+        error ? 'err' : 'ok');
+    forgotLink.style.pointerEvents = '';
+});
 
 /* --------------------------------------------------------- Второй фактор */
 

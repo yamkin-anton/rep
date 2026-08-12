@@ -344,25 +344,58 @@ async function loadStudents() {
             <td><span class="status-dot ${person.approved ? 'status-ok' : 'status-off'}">
                 ${person.approved ? 'Открыт' : 'Закрыт'}</span></td>
             <td>${person.role === 'admin' ? '' : `
-                <button class="btn btn-sm ${person.approved ? 'btn-danger' : 'btn-outline'}"
-                    data-approve="${person.id}" data-value="${person.approved ? '0' : '1'}">
-                    ${person.approved ? 'Закрыть доступ' : 'Открыть доступ'}
-                </button>`}</td>
+                <div class="row-actions">
+                    <button class="btn btn-sm ${person.approved ? 'btn-danger' : 'btn-outline'}"
+                        data-approve="${person.id}" data-value="${person.approved ? '0' : '1'}">
+                        ${person.approved ? 'Закрыть доступ' : 'Открыть доступ'}
+                    </button>
+                    <button class="btn btn-sm btn-ghost"
+                        data-reset="${escapeHtml(person.email ?? '')}">Сбросить пароль</button>
+                </div>`}</td>
         </tr>`).join('');
 }
 
 document.getElementById('students-rows').addEventListener('click', async (e) => {
-    const button = e.target.closest('button[data-approve]');
-    if (!button) return;
+    const approveBtn = e.target.closest('button[data-approve]');
+    if (approveBtn) {
+        approveBtn.disabled = true;
+        const { error } = await sb.from('profiles')
+            .update({ approved: approveBtn.dataset.value === '1' })
+            .eq('id', approveBtn.dataset.approve);
+
+        if (error) alert(`Не получилось: ${error.message}`);
+        await loadStudents();
+        return;
+    }
+
+    const resetBtn = e.target.closest('button[data-reset]');
+    if (resetBtn) await sendReset(resetBtn);
+});
+
+/** Отправляет ученику письмо со ссылкой для сброса пароля. */
+async function sendReset(button) {
+    const email = button.dataset.reset;
+    if (!email) return;
+    if (!confirm(`Отправить ученику ${email} письмо со ссылкой для сброса пароля?`)) return;
 
     button.disabled = true;
-    const { error } = await sb.from('profiles')
-        .update({ approved: button.dataset.value === '1' })
-        .eq('id', button.dataset.approve);
+    const original = button.textContent;
+    button.textContent = 'Отправляем...';
 
-    if (error) alert(`Не получилось: ${error.message}`);
-    await loadStudents();
-});
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: new URL('reset-password.html', location.href).href,
+    });
+
+    if (error) {
+        alert(`Не получилось отправить письмо: ${error.message}`);
+    } else {
+        button.textContent = 'Письмо отправлено';
+        setTimeout(() => { button.textContent = original; button.disabled = false; }, 4000);
+        return;
+    }
+    button.textContent = original;
+    button.disabled = false;
+}
 
 /* --------------------------------------------------------- Двухфакторный вход */
 

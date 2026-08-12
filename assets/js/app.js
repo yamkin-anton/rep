@@ -250,6 +250,19 @@ export function escapeHtml(value) {
 
 export const escapeAttr = escapeHtml;
 
+/**
+ * Проверяет пароль по тем же правилам, что заданы в настройках Supabase:
+ * не короче 10 символов, латинские строчная и заглавная буквы и цифра.
+ * @returns {string|null} текст ошибки или null, если всё в порядке
+ */
+export function passwordProblem(value) {
+    if (!value || value.length < 10) return 'Пароль должен быть не короче 10 символов.';
+    if (!/[a-z]/.test(value)) return 'Добавьте строчную латинскую букву.';
+    if (!/[A-Z]/.test(value)) return 'Добавьте заглавную латинскую букву.';
+    if (!/[0-9]/.test(value)) return 'Добавьте хотя бы одну цифру.';
+    return null;
+}
+
 export function formatBytes(bytes) {
     if (!bytes) return '';
     const units = ['Б', 'КБ', 'МБ', 'ГБ'];
