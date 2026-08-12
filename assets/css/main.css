@@ -1439,9 +1439,22 @@ table {
     min-width: 720px;
 }
 
-.table-wrap th:first-child,
-.table-wrap td:first-child {
-    min-width: 280px;
+/* В таблице уроков первая колонка — название, ей нужен запас ширины. */
+#panel-list th:first-child,
+#panel-list td:first-child {
+    min-width: 260px;
+}
+
+/* В таблице учеников первая колонка — галочка, она узкая; имя идёт вторым
+   столбцом, и запас ширины нужен именно ему. */
+#panel-students th:first-child,
+#panel-students td:first-child {
+    width: 44px;
+    min-width: 44px;
+}
+
+#panel-students td:nth-child(2) {
+    min-width: 170px;
 }
 
 th,
