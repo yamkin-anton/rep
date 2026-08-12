@@ -696,6 +696,45 @@ p {
     color: var(--green-600);
 }
 
+/* Блок-приглашение в раздел материалов */
+.materials-teaser {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 1.6rem;
+    align-items: center;
+    padding: 2.2rem;
+}
+
+.materials-teaser .service-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0;
+}
+
+.materials-teaser .service-icon svg {
+    width: 30px;
+    height: 30px;
+}
+
+.materials-teaser h3 {
+    margin-bottom: .3rem;
+}
+
+.materials-teaser p {
+    margin: 0;
+}
+
+/* На узком экране три колонки не помещаются — складываем в столбик */
+@media (max-width: 760px) {
+    .materials-teaser {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+        gap: 1.2rem;
+        padding: 2rem 1.4rem;
+    }
+}
+
 /* Цены */
 .price {
     display: flex;
@@ -1390,6 +1429,19 @@ table {
     width: 100%;
     border-collapse: collapse;
     font-size: .93rem;
+}
+
+/* На узком экране колонки нельзя сжимать: название урока рассыпается
+   по одному слову в строку. Держим минимальную ширину и прокручиваем
+   таблицу вбок внутри .table-wrap. Первой колонке нужен отдельный
+   минимум — иначе заголовки остальных колонок забирают всё место. */
+.table-wrap table {
+    min-width: 720px;
+}
+
+.table-wrap th:first-child,
+.table-wrap td:first-child {
+    min-width: 280px;
 }
 
 th,
