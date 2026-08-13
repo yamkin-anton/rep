@@ -10,8 +10,8 @@ import {
     sb, isConfigured, authState, configWarning, videoEmbed,
     escapeHtml, formatBytes, formatDate, formatDuration,
     icons, LEVELS, CONTACT_TELEGRAM,
-} from './app.js?v=3';
-import { BUCKET_MATERIALS } from './config.js?v=3';
+} from './app.js?v=4';
+import { BUCKET_MATERIALS } from './config.js?v=4';
 
 const box = document.getElementById('lesson');
 const id = new URLSearchParams(location.search).get('id');
@@ -186,11 +186,14 @@ async function renderArchive(item) {
         return;
     }
 
+    const ext = (item.archive_name || '').split('.').pop()?.toLowerCase() ?? '';
+    const isDoc = ['pdf', 'doc', 'docx'].includes(ext);
+
     target.innerHTML = `<a class="file-item" href="${escapeHtml(data.signedUrl)}">
-        <span class="file-icon">${icons.archive}</span>
+        <span class="file-icon">${isDoc ? icons.doc : icons.archive}</span>
         <span>
             <span class="file-name">${escapeHtml(item.archive_name || 'Материалы урока')}</span>
-            <span class="file-size">${formatBytes(item.archive_size) || 'архив'} · скачать</span>
+            <span class="file-size">${formatBytes(item.archive_size) || 'файл'} · скачать</span>
         </span>
     </a>`;
 }

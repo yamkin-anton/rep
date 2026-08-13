@@ -2,8 +2,8 @@
    Главная страница: выбор направления и отправка заявки.
    ========================================================================== */
 
-import { showMsg, sb, isConfigured } from './app.js?v=3';
-import { applyContent } from './content.js?v=3';
+import { showMsg, sb, isConfigured } from './app.js?v=4';
+import { applyContent } from './content.js?v=4';
 
 /* --------------------------------------------------------- Тексты главной */
 

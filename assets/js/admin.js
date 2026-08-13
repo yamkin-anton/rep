@@ -6,9 +6,9 @@
 import {
     sb, isConfigured, requireAuth, configWarning,
     escapeHtml, formatBytes, formatDate, showMsg, hideMsg, LEVELS,
-} from './app.js?v=3';
-import { BUCKET_COVERS, BUCKET_MATERIALS } from './config.js?v=3';
-import { mergeContent } from './content.js?v=3';
+} from './app.js?v=4';
+import { BUCKET_COVERS, BUCKET_MATERIALS } from './config.js?v=4';
+import { mergeContent } from './content.js?v=4';
 
 const guard = document.getElementById('admin-guard');
 const panel = document.getElementById('admin');
@@ -191,7 +191,7 @@ function startEdit(id) {
 
     archiveHint.textContent = item.archive_path
         ? `Сейчас загружен: ${item.archive_name} (${formatBytes(item.archive_size)}). Выберите новый файл, чтобы заменить.`
-        : 'До 50 МБ на бесплатном тарифе Supabase.';
+        : 'ZIP, RAR, 7Z, PDF, DOC, DOCX — до 50 МБ на бесплатном тарифе Supabase.';
 
     hideMsg(message);
     openTab('editor');
@@ -205,7 +205,7 @@ function resetForm() {
     editorTitle.textContent = 'Новый урок';
     saveBtn.textContent = 'Сохранить урок';
     coverPreview.classList.remove('show');
-    archiveHint.textContent = 'До 50 МБ на бесплатном тарифе Supabase.';
+    archiveHint.textContent = 'ZIP, RAR, 7Z, PDF, DOC, DOCX — до 50 МБ на бесплатном тарифе Supabase.';
     hideMsg(message);
 }
 
@@ -264,7 +264,7 @@ form.addEventListener('submit', async (e) => {
 
         const archiveFile = form.elements.archive.files[0];
         if (archiveFile) {
-            showMsg(message, 'Загружаем архив с материалами...', 'info');
+            showMsg(message, 'Загружаем материалы к занятию...', 'info');
             const stored = await uploadArchive(archiveFile);
             Object.assign(payload, stored);
             setProgress(80);
@@ -312,7 +312,7 @@ async function uploadArchive(file) {
     const path = `${uid()}/${safeName(file.name)}`;
     const { error } = await sb.storage.from(BUCKET_MATERIALS)
         .upload(path, file, { upsert: false });
-    if (error) throw new Error(`архив — ${error.message}`);
+    if (error) throw new Error(`материалы — ${error.message}`);
 
     return { archive_path: path, archive_name: file.name, archive_size: file.size };
 }
@@ -843,7 +843,11 @@ function extension(name) {
 /** Имя файла для хранилища: латиница, цифры, дефис. Исходное имя храним отдельно. */
 function safeName(name) {
     const cleaned = name.normalize('NFKD').replace(/[^\w.-]+/g, '-').replace(/^-+|-+$/g, '');
-    return cleaned || 'materials.zip';
+    if (cleaned) return cleaned;
+    // Имя из одной кириллицы схлопывается в пустую строку — расширение важно сохранить,
+    // по нему подбирается иконка и браузер понимает, чем открывать скачанный файл.
+    const ext = extension(name);
+    return ext ? `materials.${ext}` : 'materials';
 }
 
 function uid() {

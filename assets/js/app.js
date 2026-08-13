@@ -4,7 +4,7 @@
    ========================================================================== */
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-import { SUPABASE_URL, SUPABASE_ANON_KEY, CONTACT_TELEGRAM } from './config.js?v=3';
+import { SUPABASE_URL, SUPABASE_ANON_KEY, CONTACT_TELEGRAM } from './config.js?v=4';
 
 /* --------------------------------------------------------- Клиент */
 
@@ -291,8 +291,8 @@ export function formatDuration(minutes) {
 
 export const LEVELS = {
     basic: 'Базовый',
-    medium: 'Средний',
-    advanced: 'Продвинутый',
+    medium: 'Повышенный',
+    advanced: 'Высокий',
 };
 
 /** Показать сообщение в блоке .form-msg */
@@ -322,6 +322,7 @@ export const icons = {
     signal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 18v-4M12 18V9M19 18V5"/></svg>',
     lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>',
     archive: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4"/></svg>',
+    doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>',
     search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
     empty: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M8 15h4"/></svg>',
     tree: '<svg viewBox="0 0 120 140" fill="none"><g stroke="currentColor" stroke-width="6.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M60 136V58"/><path d="M60 136 44 140"/><path d="M60 136 78 138"/><path d="M60 114 37.7 98.07"/><path d="M60 96 84.36 78.14"/><path d="M60 74 41.16 56.73"/><path d="M60 58 52.69 40.46"/><path d="M60 58 74.53 46.37"/></g><g stroke="currentColor" stroke-width="4" fill="none"><circle cx="32" cy="94" r="7"/><circle cx="90" cy="74" r="7"/><circle cx="36" cy="52" r="7"/><circle cx="50" cy="34" r="7"/><circle cx="80" cy="42" r="7"/></g></svg>',

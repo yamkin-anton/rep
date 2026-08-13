@@ -100,9 +100,9 @@
                             <img class="cover-preview" id="cover-preview" alt="Предпросмотр обложки">
 
                             <label class="field">
-                                <span>Архив с материалами (.zip)</span>
-                                <input type="file" name="archive" accept=".zip,.rar,.7z,application/zip">
-                                <span class="field-hint" id="archive-current">До 50 МБ на бесплатном тарифе Supabase.</span>
+                                <span>Материалы к занятию</span>
+                                <input type="file" name="archive" accept=".zip,.rar,.7z,.pdf,.doc,.docx,application/zip,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                                <span class="field-hint" id="archive-current">ZIP, RAR, 7Z, PDF, DOC, DOCX — до 50 МБ на бесплатном тарифе Supabase.</span>
                             </label>
 
                             <div class="form-row">
@@ -115,8 +115,8 @@
                                     <span>Уровень</span>
                                     <select name="level">
                                         <option value="basic">Базовый</option>
-                                        <option value="medium">Средний</option>
-                                        <option value="advanced">Продвинутый</option>
+                                        <option value="medium">Повышенный</option>
+                                        <option value="advanced">Высокий</option>
                                     </select>
                                 </label>
                                 <label class="field">
@@ -380,8 +380,8 @@
         </div>
     </footer>
 
-    <script type="module" src="assets/js/app.js?v=3"></script>
-    <script type="module" src="assets/js/admin.js?v=3"></script>
+    <script type="module" src="assets/js/app.js?v=4"></script>
+    <script type="module" src="assets/js/admin.js?v=4"></script>
 </body>
 
 </html>

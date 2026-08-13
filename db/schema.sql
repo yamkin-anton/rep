@@ -35,7 +35,8 @@ create table if not exists public.lectures (
     description   text,                     -- полное описание урока
     cover_url     text,                     -- публичная ссылка на обложку
     video_url     text,                     -- ссылка на YouTube / VK / Rutube / файл
-    archive_path  text,                     -- путь к zip внутри бакета materials
+    archive_path  text,                     -- путь к файлу материалов внутри бакета materials
+                                            -- (zip/rar/7z/pdf/doc/docx)
     archive_name  text,                     -- исходное имя файла
     archive_size  bigint,
     links         jsonb not null default '[]'::jsonb,  -- [{ "title": "...", "url": "..." }]
@@ -310,7 +311,9 @@ grant select on public.site_content to anon, authenticated;
 -- ----------------------------------------------------------------------------
 --  8. Хранилище файлов
 --     covers    — обложки, публичный бакет (картинки открыты всем)
---     materials — zip-архивы, закрытый бакет: ссылки выдаются на время
+--     materials — файлы к занятиям (архивы и документы), закрытый бакет:
+--                 ссылки выдаются на время. MIME не ограничиваем — тип проверяет
+--                 форма в админке, а бакет закрыт политиками RLS
 -- ----------------------------------------------------------------------------
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
