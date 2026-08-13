@@ -4,7 +4,7 @@
    ========================================================================== */
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-import { SUPABASE_URL, SUPABASE_ANON_KEY, CONTACT_TELEGRAM } from './config.js?v=2';
+import { SUPABASE_URL, SUPABASE_ANON_KEY, CONTACT_TELEGRAM } from './config.js?v=3';
 
 /* --------------------------------------------------------- Клиент */
 
@@ -324,6 +324,6 @@ export const icons = {
     archive: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4"/></svg>',
     search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
     empty: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M8 15h4"/></svg>',
-    tree: '<svg viewBox="0 0 120 140" fill="none"><g stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M60 118V48"/><path d="M60 118 36 138"/><path d="M60 118 84 138"/><path d="M60 104 44 88V74"/><path d="M60 92 78 74V62"/><path d="M60 78 40 58"/><path d="M60 64 82 42"/></g><g fill="currentColor"><circle cx="44" cy="68" r="6"/><circle cx="78" cy="56" r="6"/><circle cx="35" cy="53" r="6"/><circle cx="87" cy="37" r="6"/><circle cx="60" cy="42" r="6"/></g></svg>',
+    tree: '<svg viewBox="0 0 120 140" fill="none"><g stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M60 128V70"/><path d="M60 128 43 138"/><path d="M60 128 77 138"/><path d="M60 128 60 140"/><path d="M60 100 31 79"/><path d="M60 100 89 79"/><path d="M60 88 44 66"/><path d="M44 66 28 54"/><path d="M44 66 49 58"/><path d="M60 88 76 66"/><path d="M76 66 92 54"/><path d="M76 66 71 58"/><path d="M60 70 43 34"/><path d="M60 70 77 34"/><path d="M60 70 60 30"/></g><g stroke="currentColor" stroke-width="3.6" fill="none"><circle cx="31" cy="79" r="6.5"/><circle cx="89" cy="79" r="6.5"/><circle cx="28" cy="54" r="6.5"/><circle cx="92" cy="54" r="6.5"/><circle cx="49" cy="58" r="6"/><circle cx="71" cy="58" r="6"/><circle cx="43" cy="34" r="6.5"/><circle cx="77" cy="34" r="6.5"/><circle cx="60" cy="26" r="7"/></g></svg>',
     link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>',
 };

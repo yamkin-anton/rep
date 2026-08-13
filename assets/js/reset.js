@@ -6,7 +6,7 @@
    разрешает сменить пароль. Без действительной ссылки форма не появится.
    ========================================================================== */
 
-import { sb, isConfigured, showMsg, passwordProblem } from './app.js?v=2';
+import { sb, isConfigured, showMsg, passwordProblem } from './app.js?v=3';
 
 const checking = document.getElementById('reset-checking');
 const invalid = document.getElementById('reset-invalid');
